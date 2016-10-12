@@ -1,5 +1,6 @@
-/****** MAKE SURE TO ADD COMMENTS TO ALL FUNCTIONS AND COMPLEX PARTS OF THE APP *********/
-/****** MAKE SURE TO TEST APP IN AT LEAST 3 DIFFERENT BROWSERS *********/
+/****** MAKE SURE TO ADD COMMENTS TO ALL FUNCTIONS AND COMPLEX PARTS OF THE APP ******/
+/****** MAKE SURE TO TEST APP IN AT LEAST 3 DIFFERENT BROWSERS ******/
+/****** OMIT SEARCH OF SUBSTRINGS OF @ AND .COM ******/
 
 //Questions for Team Treehouse: 
   //When defining a function, is there a benefit to defining local variables within the
@@ -22,6 +23,8 @@
 var $studentList = $(".student-list");
 
 //Variable that stores search results that are to be displayed after search function is run
+//same as var searchResultCounter?
+//Same as lastPageNumber scenario
 var studentListHolder;
 
 //Variable that stores the number of list-items within the unordered-list with the class student-list
@@ -33,16 +36,21 @@ var lastPageNumber;
 //Current page number determined by default state of page loading or what user has selected by clicking pagination anchor
 var currentPageNumber = 1;
 
-//Variable used to store "input" element's text, to be updated in later function(s) to capture user text input
+//Variable used to store "input" element's text, to be updated in later function(s) to capture user input dynamically
 var $input;
 
 //Variable that stores the number of matching search results 
 var searchResultCount;
 
+//Message that displays if no search results are shown
+// var message; //= $("ul.student-list").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>").css("display", "none");
+
 //Adds search input and search button to page-header class
 $(function() {
 
   $(".page-header").append("<div class='student-search'><input placeholder='Search for students...'><button>Search</button>");
+
+  $(".student-list").append('<div class="pagination"><ul></ul></div>');
 
 });
 
@@ -51,17 +59,24 @@ $(function() {
   //Maybe bind function to onload to initialize and then to also be available to be called by name to reset pages
 
 //$(function (totalPageLinks, $listItem, $pageLink) {
-// function initializePages (totalPageLinks, $listItem, $pageLink){}
+// function initializePages (totalPageLinks, $listItem, $pageLink){}  //ARGUEMENTS HERE SEEM WARRANTED
 
-$(function (totalPageLinks, $listItem, $pageLink) {
 
-  //DOES THIS LINE OF CODE NEED TO BE OUTSIDE OF THIS FUNCTION?
-  $(".student-list").append('<div class="pagination"><ul></ul></div>');
+//NAME THIS FUNCTION SO IT CAN BE CALLED LATER
+$(function() {
+
+  var $listItem;
+  var $pageLink;
+  var totalPageLinks;
 
   //Calculate the number of pagination elements needed to contain the total number 10 student-list item groups
   totalPageLinks = Math.ceil(studentListSize/10);
 
   //Initializes all pagination anchor elements
+    //Initialization is done by first resetting the number of list-items attached to the unordered list and then
+    //by adding the appropriate number of $listItems and $pageLinks
+  $(".pagination ul li").detach();
+
   for (var j = 0; j < totalPageLinks; j++) {
       $pageUl = $(".pagination ul");
       $listItem = $("<li></li>");
@@ -72,14 +87,14 @@ $(function (totalPageLinks, $listItem, $pageLink) {
 
     }
 
-   //addClass "active" to the first pagination anchor element
-   $(".pagination a").eq(0).addClass("active");
-
     //************** REMOVE THE NEXT IF STATEMENT? *******************
     //Show appropriate number of first set of student-list elements when student-list is small (redundant)
     if(($studentList.children().length) < 10){
       $(".student-list li").show();
     } else {
+
+      //addClass "active" to the first pagination anchor element
+      $(".pagination a").eq(0).addClass("active");
 
       //Hide all student-list list item elements per page  
       for (var j = 0; j < studentListSize; j++){
@@ -92,25 +107,36 @@ $(function (totalPageLinks, $listItem, $pageLink) {
       }
     }
 
-/********** BINDING OF HANDLER EVENTS TO PAGE ELEMENTS **********/
+/****** BINDING OF HANDLER EVENTS TO PAGE ELEMENTS - AVOID REDUNDANT CALLS  BY PUTTING OUTSIDE OF THIS FUNCTION
+  DOESN'T BIND PROPERLY OUTSIDE OF THIS FUNCTION ******/
+
+  // PAGINATION FUNCTION NEEDS TO BE CALLED FOR EACH SEARCH AS WELL
+
+//*******GET EVENT HANDLERS OUTSIDE OF THE PAGINATION FUNCTION FOR APP TO WORK******
 
   //On click, function manageClasses adds and removes active class on clicked anchor elements
   $(".pagination a").click(manageClasses);
 
-  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
-    //The binding of this handler does work with the code below
-  // $(".student-search input").keyup(searchStudentElements);
-
   //On click, function searchStudentElements searches through student-list elements using text within student-search input element
-    //Also needs to be activated when user presses enter? (focus/blur? or submit?)
   $(".student-search button").click(searchStudentElements);
+
+  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
+  $(".student-search input").keyup(searchStudentElements);
+
+  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
+  //IS THIS WHERE IT SHOULD BE?
+  $(".student-search input").keyup(manageClasses);
+
+  //RESET STUDENTLISTSIZE TO BE THE TOTAL UNSORTED LIST ELEMENT LIST SIZE FOR ANY FUTURE SEARCHES & ITERATIONS
+  // studentListSize = $studentList.children().length;
 
 });
 
-
 //*************************************************************************
+//RENAME THIS FUNCTION AS CREATEPAGINATIONELEMENTS, OR AS SOMETHING MORE SPECIFIC
 function manageClasses (){
    
+  //Maybe add first page here?
 
   $(".pagination a").removeClass("active");
   $(this).addClass("active");
@@ -143,62 +169,46 @@ function manageClasses (){
   }
 }
 
+//**** IMMEDIATELY AFTER EACH SEARCH, PAGINATION SHOULD BE CALLED
 //Function searches for and returns paginated results for string entered into "input" element by user to match user names and/or emails
 function searchStudentElements(){
 
-  //Search button fires on click
-  //Input element text fires and is stored within "$input" variable
-
-  //This is for dynamic search - start with search on click of .student-search button element
-  // var keyPressed = $(this).val();
-
-  //Get text from student-search input element to be used to search strings within student-list elements
-  // currentPageNumber = parseInt($(this).text());
 
   //Reset studentListHolder to ready it to cache search results (BUG)
+  //$studentList.length is used in another function to determine the number of pages to be displayed
   // studentListHolder = $studentList;
   // $studentlist = "";
 
   //Variable that stores the number of matching search results is set to zero for new count of search result
   var searchResultCount = 0;
 
-  //Get text from "input" element
+  //Get "input" element
   $input = $("input");
+
+  //Get user names
+  $userNames = $(".student-details h3");
+
+  //Search by email using full or partial strings
+    //Get email: "span .email"
+    // console.log($emails.eq(2).text()); is working code
+  $emails = $("span.email");
  
 
-  //Perform search functionality if "input" element is NOT empty when search button is clicked
+  //Perform search functionality if "input" element value is NOT empty when search button is clicked
   if($input.val().length !== -1){
     
-    $(".student-list li").hide();
+    // $(".student-list li").hide();
+    
+    //Display string within "input" element within the console
     console.log($input.val());
+    
     //Perform search functionality
 
-    //
-    // string???.toLowerCase().match();
-    
-    //Search by name using full or partial strings
-      //Select user names
-    $userNames = $(".student-details h3");
-       
-       //Outputs user name texts without spaces between last name and first name of next user
-    //     //Convert toLowerCase(): str.toLowerCase();
-    //     //Perform search - if NOT each() match() hide() element eq() and return student-list
-    //     string???.toLowerCase().match();
-
-      //Search by email using full or partial strings
-        //Get email: "span .email"
-    $emails = $("span.email");
-
-        //Outputs email text without spaces - can make more specific selectors? or use diff func?
-        //DISPLAYS THE THIRD EMAIL! WOOOOO!!!!!!!!
-        // console.log($emails.eq(2).text());
-        
   
-        
-
       //Loop that iterates over all $userNames and $emails
       for(var i = 0; i < studentListSize; i++){
-        
+       //****** Does the below line allow the pagination to occur again? Compare with pagination function 
+        $(".student-list li").eq(i).hide();
         //Search for matches to entered (sub)string within the "input" element when search button is clicked
         if($userNames.eq(i).text().indexOf($input.val().toLowerCase()) !== -1 || $emails.eq(i).text().indexOf($input.val().toLowerCase()) !== -1){
 
@@ -208,42 +218,40 @@ function searchStudentElements(){
           //Display new student-list in group(s) of 10 with proper pagination
           // ARE SHOWN RESULTS PAGINATED????? NEED A PAGINATION FUNCTION? (TO BE CALLED AFTER THE FOR LOOP)
           $(".student-list li").eq(i).show();
+          
+          //***** searchResultCount is new studentListSize to be used in new pagination function call
           searchResultCount++;
 
-          // studentListHolder += $emails.eq(i);
-          // console.log($emails.eq(i).text());
-
-          // console.log($userNames.eq(i).text());
-          // console.log($emails.eq(i).text());
+          //Works properly by showing that searchResultCount updates for each search performed, even on keyup
+          console.log(searchResultCount);
         }
 
       }
 
+      // studentListSize = searchResultCount;
+      
       //Call pagination function here?
+      //Pagination is messed up after search because the function has no name
 
+      // manageClasses();
 
-        //add parent (of parent) element of matching userName or email to student-list
-
-        //Convert toLowerCase(): str.toLowerCase();
-        //Insert space after each email address ends (after ".com" string)
-        //Perform search - if NOT each() match() hide() element eq() and return updated student-list, or 
-          //call initialization function with arguement of studentListHolder ?
-
-        //BONUS - objects should dyanmically match search "input" text when onKeyUp fires
 
       //******This needs to be the argument called to populate the page(s) with student-items
       // return $studentList;
+      // return searchResultCount;
+
 
     }
 
 //If "input" element text is empty, then initial student-list is shown (reset) when search button is clicked
   if($input.val().length === 0){
 
+    // searchResultCount = 0;
     //CURRENTLY DISPLAYS ALL ELEMENTS WITHIN A SINGLE PAGE - PAGINATION IS FAILING FOR FUNCTION CALL ON INPUT RESET
     //Name the initialization function and write that name below... should be it...
 
     //initializationFunction();
-    manageClasses();
+    // manageClasses();
 
   }
 
@@ -251,136 +259,45 @@ function searchStudentElements(){
     //Use text within "input" element in order to search student-list for matching strings
     //return matching strings as new student-list
 
-  
-
-  /*********** BELOW IS FOR DYANMIC SEARCH FUNCTIONALITY ************/
-
+  // ?????????  
   //Check if search function has been run before setting the page numbers
     //if search function has been run, then populate student-list with the results of the search function
 
-  //Perform search of student-list elements and reset "student-list" variable to store or to return search results
-
-  //Run search using keyup() function that is binded to the search text input element "on.keyup()"
-
+  //**** Could also run a hide message function if result count is not 0 and call pagination function at the end?
   if(searchResultCount === 0){
-    //Show message
+    
+    //****** Show message - WORKS BUT NEEDS TO BE DETACHED UPON PAGINATION FUNCTION CALL
+    displayMessage();
 
   } else{
+      //DOES PAGINATION NEED TO BE CALLED HERE IF SEARCH RESULT IS NOT ZERO? LOOKS RIGHT.
       console.log("Call pagination function here");
+      //initializePages();
+
+      //Needs to be done with CSS SINCE MESSAGE IS NOT A FUNCTION OR COULD DETACH THE DISPLAYMESSAGE() HTML
+      // message.hide();
   }
 
 };
 
+//Assigns a "no search results found" HTML to message variable
+// function displayMessage(){
 
+//   *** HTML FOR THE "NO SEARCH RESULTS AVAILABLE" MESSAGE, needs ID, function to display message ***
+//   message = $("ul.student-list").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
+//   // message.show();
 
-/*
-
-//Use focus method since form element can be reached by keyboard and by mouse
-// var inputTextField = $(".place-holder").text().val(); //returns "Search for students..."
-
-// //IS THIS NECESSARY?
-// $("input").focus(function(){
-
-//   //reset on focus
-//   $(this).val() = "";
-
-//       //Bind student-search with eventListener onclick that resets the text within the 'student-search input'
-     
-//       //set text back after focus (off-focus?) if focus is gone
-//       //otherwise, display the class ".place-holder" input text of "Search for students..."
-// });
-
-
-
-// //program text interactions within input like what happens on focus or click, after search is performed, etc.
-  //h3 text within student-list
-//select button properly
-
-  //var searchResults = [];
-
-  //return 
-});
+// }
 
 
 
 
 
 
-var $studentListItem = $("<li></li>");
-$(".ul").each(studentListLength???).append($studentListItem);
-
-//create 'a' within 'li'
-var $studentAnchor = $("<a></a>");
-$(".li").each(studentListLength???).append($studentAnchor);
-
-//append 'href = #' to 'a' with proper page number LOGIC FOR PAGE NUMBER IS CURRENTLY THAT ALL PAGES GET SAME NUMBER
-
-for(var i = 0; pages < 0; i++){
-
-  $(".a").each().append('href = #'+ currentPageNumber);
-}
-
-
-function getPagenation() {
-  //append conditional url text to 'href' and addClass 'active' to page 1, converted list length formula to string
-
-};
-
-function setPagenation() {
-
-//Set the first page anchor on the page
-
-//use document.createTextNode(n) where n in the proper page number
-//use totalPageNumber(), the number of pages to create, in order to create a loop of appropriate text nodes to append to the appropriate hrefs within the anchors within the 'li's within the ul within the div
-//Select text within each href and replace it with variable, for loop that uses each() and innerHTML and/or attr()?
-
-//Make this bit correct based on http://api.jquery.com/attr/
-var addHref = $( ".pagenation ul li a" ).each("a").attr( "href" ); //correct use of each() method?
-$(".pagenation ul li a").text(addHref);
-
-
-//number of 'li' within the 'ul', so loop through 'ul' with particular formula, assume n = total number of students
-//Limit ul of student-list displayed per page to 10, bind to click of pagination and onload of screen for first ten students
-      //Hide all but first 10 when first page loads
-      //if length < 10, display all (probably unnecessary with well written looping logic)
-      //if page n and n!=1, display 11-20, unless students less than 20 then display all - simplify - while list.length is less than displayCache display student objects '(page number * 10 )- 10')
-    //Display remainder of students on final page, lastChild?
-    //add selector ".student-item:last-child" to the final displayed element of the list (loop through all except last 1 if student list length is greater than 1, else add selector of last child to first li)
-};
-
-
-
-
-//Display up to 10 students for a particular 'active' pagination element on click of pagination link
-$(accessStudentObject???).each(function(){
-
-
-});
+/********
 
 //Bind search button to return and to show proper student results onclick
-$("button").click(function(){
-    
-    //Make sure "Susan" also searches for and returns "susan"
-    //Hide not matching search options
       //paginate search results
-    //BONUS - autocomplete search while user types with student firstName or lastName, As the user types in the search box, dynamically filter the student listings. In other words, after each letter is typed into the search box, display any listings that match .
-
-});
-
-
-
-$('.student-search').bind('input', function(e) {
-
-  
-    
-    //Make sure "Susan" also searches for and returns "susan"
-    //Hide not matching search options
-      //paginate search results
-    //BONUS - autocomplete search while user types with student firstName or lastName, As the user types in the search box, dynamically filter the student listings. In other words, after each letter is typed into the search box, display any listings that match .
-};
-
-
-
     
 
   //Sequential pagination divs
@@ -401,6 +318,5 @@ $('.student-search').bind('input', function(e) {
   //Problem - if there are no search results to return, then display a message within the HTML to let the user know there are no matches
 
     //Use formula to display correct student elements (as enterted into a student object) on each page
-    //Loop through remaining results if there is a remainder after the list of students is divided by 10
-    //use modulus "%" to get the number of remaining elements to display on the final page, unless that number is zero (for loop to create div elements for pagination and with hrefs)
+
 ********/
