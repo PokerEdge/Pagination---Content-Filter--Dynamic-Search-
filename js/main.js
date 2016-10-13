@@ -1,3 +1,5 @@
+/* ** Follow studentListSize variable --> a function needs to return a new $studentList so that searches work ** */
+
 /****** MAKE SURE TO ADD COMMENTS TO ALL FUNCTIONS AND COMPLEX PARTS OF THE APP ******/
 /****** MAKE SURE TO TEST APP IN AT LEAST 3 DIFFERENT BROWSERS ******/
 /****** OMIT SEARCH OF SUBSTRINGS OF @ AND .COM ******/
@@ -18,8 +20,16 @@
 
 //Problem - code user interactivity to work with styled elements
 
+//Adds search input and search button to page-header class on ready
+$(function() {
 
-//Variable that stores the student-list within the HTML of index.html
+  $(".page-header").append("<div class='student-search'><input placeholder='Search for students...'><button>Search</button>");
+
+  $(".student-search button").click(searchStudentElements);
+  // $(".student-list").append('<div class="pagination"><ul></ul></div>');
+});
+
+//Variable that stores the student-list that is in the HTML
 var $studentList = $(".student-list");
 
 //Variable that stores search results that are to be displayed after search function is run
@@ -42,17 +52,39 @@ var $input;
 //Variable that stores the number of matching search results 
 var searchResultCount;
 
+
 //Message that displays if no search results are shown
 // var message; //= $("ul.student-list").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>").css("display", "none");
 
-//Adds search input and search button to page-header class
-$(function() {
 
-  $(".page-header").append("<div class='student-search'><input placeholder='Search for students...'><button>Search</button>");
+//Variable that points to the button for event binding
+// var $button = $(".page button");
 
-  $(".student-list").append('<div class="pagination"><ul></ul></div>');
+  // $(".student-search button").click(searchStudentElements);
 
-});
+function bindHandlers(){
+
+  // PAGINATION FUNCTION NEEDS TO BE CALLED FOR EACH SEARCH AS WELL
+
+//*******GET EVENT HANDLERS OUTSIDE OF THE PAGINATION FUNCTION FOR APP TO WORK******
+
+  //On click, function manageClasses adds and removes active class on clicked anchor elements
+  $(".pagination a").click(manageClasses);
+
+  //On click, function searchStudentElements searches through student-list elements using text within student-search input element
+  $(".student-search button").click(searchStudentElements);
+
+  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
+  $(".student-search input").keyup(searchStudentElements);
+
+
+  $(".student-search input").keyup(initializePages);
+
+  $(".student-search input").keyup(manageClasses);
+
+  //RESET STUDENTLISTSIZE TO BE THE TOTAL UNSORTED LIST ELEMENT LIST SIZE FOR ANY FUTURE SEARCHES & ITERATIONS
+  // studentListSize = $studentList.children().length;
+}
 
 //Initialize page with appropriate number of pagenation elements and add the class "active" to the first anchor element
 //*********** NAME THIS FUNCTION SO THAT IT CAN BE CALLED IN THE CASE THAT THE USER DELETES TEXT FROM "INPUT" ELEMENT
@@ -63,21 +95,27 @@ $(function() {
 
 
 //NAME THIS FUNCTION SO IT CAN BE CALLED LATER
-$(function() {
+function initializePages(studentListSize) {
 
+  //TXT DISPLAYS IN DOM
+  console.log("initializePages is being called");
+
+  var totalPageLinks;
   var $listItem;
   var $pageLink;
-  var totalPageLinks;
+  var $pageUl;
 
   //Calculate the number of pagination elements needed to contain the total number 10 student-list item groups
   totalPageLinks = Math.ceil(studentListSize/10);
 
+  $(".student-list").append('<div class="pagination"><ul></ul></div>');
   //Initializes all pagination anchor elements
     //Initialization is done by first resetting the number of list-items attached to the unordered list and then
     //by adding the appropriate number of $listItems and $pageLinks
+  
   $(".pagination ul li").detach();
 
-  for (var j = 0; j < totalPageLinks; j++) {
+    for (var j = 0; j < totalPageLinks; j++) {
       $pageUl = $(".pagination ul");
       $listItem = $("<li></li>");
       $pageLink = $('<a href="#">' + (j+1) + '</a>');
@@ -87,10 +125,12 @@ $(function() {
 
     }
 
-    //************** REMOVE THE NEXT IF STATEMENT? *******************
-    //Show appropriate number of first set of student-list elements when student-list is small (redundant)
-    if(($studentList.children().length) < 10){
-      $(".student-list li").show();
+    //If no students in list then display a message to let the user know to try another search and that list is empty
+    if(studentListSize === 0){
+      
+      console.log("THIS IS WHERE THE NO SEARCH RESULTS SHOWN MESSAGE GOES");
+      // displayMessage();
+    
     } else {
 
       //addClass "active" to the first pagination anchor element
@@ -107,37 +147,19 @@ $(function() {
       }
     }
 
-/****** BINDING OF HANDLER EVENTS TO PAGE ELEMENTS - AVOID REDUNDANT CALLS  BY PUTTING OUTSIDE OF THIS FUNCTION
-  DOESN'T BIND PROPERLY OUTSIDE OF THIS FUNCTION ******/
+    $(".pagination a").click(manageClasses);
 
-  // PAGINATION FUNCTION NEEDS TO BE CALLED FOR EACH SEARCH AS WELL
+}
 
-//*******GET EVENT HANDLERS OUTSIDE OF THE PAGINATION FUNCTION FOR APP TO WORK******
-
-  //On click, function manageClasses adds and removes active class on clicked anchor elements
-  $(".pagination a").click(manageClasses);
-
-  //On click, function searchStudentElements searches through student-list elements using text within student-search input element
-  $(".student-search button").click(searchStudentElements);
-
-  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
-  $(".student-search input").keyup(searchStudentElements);
-
-  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
-  //IS THIS WHERE IT SHOULD BE?
-  $(".student-search input").keyup(manageClasses);
-
-  //RESET STUDENTLISTSIZE TO BE THE TOTAL UNSORTED LIST ELEMENT LIST SIZE FOR ANY FUTURE SEARCHES & ITERATIONS
-  // studentListSize = $studentList.children().length;
-
-});
 
 //*************************************************************************
 //RENAME THIS FUNCTION AS CREATEPAGINATIONELEMENTS, OR AS SOMETHING MORE SPECIFIC
 function manageClasses (){
    
+  //TXT DISPLAYS IN DOM
+  console.log("manageClasses is being called");
+   
   //Maybe add first page here?
-
   $(".pagination a").removeClass("active");
   $(this).addClass("active");
 
@@ -159,6 +181,10 @@ function manageClasses (){
   var endIndex = currentPageNumber * 10;
 
   //Show appropriate student-list li given currentPageNumber assigned values to the startIndex and endIndex
+
+//***************************************************************************
+
+  //******* NEEDS TO USE A VARIABLE, RATHER THAN "STUDENT-LIST LI" SO THAT NEW SEARCHES CAN BE PERFORMED
   for(var i = 0; i < endIndex; i++){
     $(".student-list li").eq(i).hide();
       
@@ -167,6 +193,7 @@ function manageClasses (){
       $(".student-list li").eq(i).show();
     }
   }
+
 }
 
 //**** IMMEDIATELY AFTER EACH SEARCH, PAGINATION SHOULD BE CALLED
@@ -178,6 +205,7 @@ function searchStudentElements(){
   //$studentList.length is used in another function to determine the number of pages to be displayed
   // studentListHolder = $studentList;
   // $studentlist = "";
+  console.log("searchStudentElements is being called");
 
   //Variable that stores the number of matching search results is set to zero for new count of search result
   var searchResultCount = 0;
@@ -188,9 +216,7 @@ function searchStudentElements(){
   //Get user names
   $userNames = $(".student-details h3");
 
-  //Search by email using full or partial strings
-    //Get email: "span .email"
-    // console.log($emails.eq(2).text()); is working code
+  //Get emails
   $emails = $("span.email");
  
 
@@ -227,6 +253,8 @@ function searchStudentElements(){
         }
 
       }
+
+  
 
       // studentListSize = searchResultCount;
       
@@ -267,33 +295,52 @@ function searchStudentElements(){
   if(searchResultCount === 0){
     
     //****** Show message - WORKS BUT NEEDS TO BE DETACHED UPON PAGINATION FUNCTION CALL
-    displayMessage();
+      
+    console.log("THIS IS WHERE THE NO SEARCH RESULTS SHOWN MESSAGE GOES");
+    // displayMessage();
 
   } else{
       //DOES PAGINATION NEED TO BE CALLED HERE IF SEARCH RESULT IS NOT ZERO? LOOKS RIGHT.
       console.log("Call pagination function here");
-      //initializePages();
 
+      studentListSize = searchResultCount;
+      initializePages(studentListSize);
+
+      // manageClasses();
       //Needs to be done with CSS SINCE MESSAGE IS NOT A FUNCTION OR COULD DETACH THE DISPLAYMESSAGE() HTML
       // message.hide();
   }
-
-};
+  // return studentListSize;
+}
 
 //Assigns a "no search results found" HTML to message variable
-// function displayMessage(){
+function displayMessage(){
 
-//   *** HTML FOR THE "NO SEARCH RESULTS AVAILABLE" MESSAGE, needs ID, function to display message ***
-//   message = $("ul.student-list").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
-//   // message.show();
+  /*** HTML FOR THE "NO SEARCH RESULTS AVAILABLE" MESSAGE, needs ID, function to display message ***/
+  message = $(".student-list ul li").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
+  // message.show();
 
-// }
+}
+
+initializePages(studentListSize);
+  
+  //Binds pagination anchor element so that on user click, function manageClasses adds and removes active class on clicked anchor elements
 
 
 
+  //***** BINDING IS FAILING FOR SOME REASON
+  //Binds search button so that on user click, function searchStudentElements searches through student-list elements for text within student-search input element
+// $(".student-search button").click(searchStudentElements);
+
+  // //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
+  // $(".student-search input").keyup(searchStudentElements);
 
 
+  // $(".student-search input").keyup(initializePages);
 
+  // $(".student-search input").keyup(manageClasses);
+
+// searchStudentElements();
 /********
 
 //Bind search button to return and to show proper student results onclick
