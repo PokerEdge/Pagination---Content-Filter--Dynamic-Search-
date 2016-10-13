@@ -147,7 +147,10 @@ function initializePages(studentListSize) {
       }
     }
 
+
     $(".pagination a").click(manageClasses);
+
+    studentListSize = $studentList.children().length;
 
 }
 
@@ -232,7 +235,9 @@ function searchStudentElements(){
 
   
       //Loop that iterates over all $userNames and $emails
-      for(var i = 0; i < studentListSize; i++){
+      //for(var i = 0; i < studentListSize; i++)
+
+      for(var i = 0; i < $studentList.children().length; i++){
        //****** Does the below line allow the pagination to occur again? Compare with pagination function 
         $(".student-list li").eq(i).hide();
         //Search for matches to entered (sub)string within the "input" element when search button is clicked
@@ -295,9 +300,9 @@ function searchStudentElements(){
   if(searchResultCount === 0){
     
     //****** Show message - WORKS BUT NEEDS TO BE DETACHED UPON PAGINATION FUNCTION CALL
-      
+    $(".student-list li").hide();  
     console.log("THIS IS WHERE THE NO SEARCH RESULTS SHOWN MESSAGE GOES");
-    // displayMessage();
+    displayMessage();
 
   } else{
       //DOES PAGINATION NEED TO BE CALLED HERE IF SEARCH RESULT IS NOT ZERO? LOOKS RIGHT.
@@ -310,15 +315,17 @@ function searchStudentElements(){
       //Needs to be done with CSS SINCE MESSAGE IS NOT A FUNCTION OR COULD DETACH THE DISPLAYMESSAGE() HTML
       // message.hide();
   }
-  // return studentListSize;
+  return studentListSize;
 }
 
 //Assigns a "no search results found" HTML to message variable
 function displayMessage(){
 
   /*** HTML FOR THE "NO SEARCH RESULTS AVAILABLE" MESSAGE, needs ID, function to display message ***/
-  message = $(".student-list ul li").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
-  // message.show();
+  //DEFAULT AS HIDDEN AND SHOW IF SEARCH RESULTS ARE EMPTY
+  //MUST BE REMOVED IF SEARCH RESULTS ARE TO BE EMPTY AGAIN (AVOID DUPLICATE MESSAGAE) OR IF THEY'RE NOT EMPTY ON NEW SEARCH
+
+  message = $(".student-list").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
 
 }
 
