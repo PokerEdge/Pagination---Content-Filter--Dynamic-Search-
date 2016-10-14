@@ -1,4 +1,4 @@
-/* ** Follow studentListSize variable --> a function needs to return a new $studentList so that searches work ** */
+/* ** MAKE PAGINATION METHOD SO THAT IT CAN BE CALLED AFTER SEARCHES AND AFTER KEYUP SEARCHES ** */
 
 /****** MAKE SURE TO ADD COMMENTS TO ALL FUNCTIONS AND COMPLEX PARTS OF THE APP ******/
 /****** MAKE SURE TO TEST APP IN AT LEAST 3 DIFFERENT BROWSERS ******/
@@ -26,6 +26,12 @@ $(function() {
   $(".page-header").append("<div class='student-search'><input placeholder='Search for students...'><button>Search</button>");
 
   $(".student-search button").click(searchStudentElements);
+
+  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
+  //Works but pagination isn't working - isn't making first element active properly
+  $(".student-search input").keyup(searchStudentElements);
+
+
   // $(".student-list").append('<div class="pagination"><ul></ul></div>');
 });
 
@@ -62,6 +68,8 @@ var searchResultCount;
 
   // $(".student-search button").click(searchStudentElements);
 
+/***
+
 function bindHandlers(){
 
   // PAGINATION FUNCTION NEEDS TO BE CALLED FOR EACH SEARCH AS WELL
@@ -86,6 +94,8 @@ function bindHandlers(){
   // studentListSize = $studentList.children().length;
 }
 
+***/
+
 //Initialize page with appropriate number of pagenation elements and add the class "active" to the first anchor element
 //*********** NAME THIS FUNCTION SO THAT IT CAN BE CALLED IN THE CASE THAT THE USER DELETES TEXT FROM "INPUT" ELEMENT
   //Maybe bind function to onload to initialize and then to also be available to be called by name to reset pages
@@ -107,16 +117,19 @@ function initializePages(studentListSize) {
 
   //Calculate the number of pagination elements needed to contain the total number 10 student-list item groups
   totalPageLinks = Math.ceil(studentListSize/10);
+  
+  $(".pagination").detach();
 
   $(".student-list").append('<div class="pagination"><ul></ul></div>');
   //Initializes all pagination anchor elements
     //Initialization is done by first resetting the number of list-items attached to the unordered list and then
     //by adding the appropriate number of $listItems and $pageLinks
   
-  $(".pagination ul li").detach();
+  //Possibly use remove to lighten load of server since data may not need to be stored
+
+  $pageUl = $(".pagination ul");
 
     for (var j = 0; j < totalPageLinks; j++) {
-      $pageUl = $(".pagination ul");
       $listItem = $("<li></li>");
       $pageLink = $('<a href="#">' + (j+1) + '</a>');
 
@@ -136,6 +149,9 @@ function initializePages(studentListSize) {
       //addClass "active" to the first pagination anchor element
       $(".pagination a").eq(0).addClass("active");
 
+// *********** ISSUE IS HERE!!!!!!! WHY DOES COMMENETING THIS OUT WORK???????
+/***
+
       //Hide all student-list list item elements per page  
       for (var j = 0; j < studentListSize; j++){
         $(".student-list li").eq(j).hide();
@@ -145,21 +161,25 @@ function initializePages(studentListSize) {
       for (var i = 0; i < 10; i++){
         $(".student-list li").eq(i).show();
       }
+    
+***/
     }
-
-
+    
     $(".pagination a").click(manageClasses);
+
+    //
+    // manageClasses();
 
     studentListSize = $studentList.children().length;
 
 }
 
 
-//*************************************************************************
+//****************************************** - SIMPLY NEED TO ADD PAGINATION TO SEARCH RESULTS
+
 //RENAME THIS FUNCTION AS CREATEPAGINATIONELEMENTS, OR AS SOMETHING MORE SPECIFIC
 function manageClasses (){
    
-  //TXT DISPLAYS IN DOM
   console.log("manageClasses is being called");
    
   //Maybe add first page here?
@@ -203,11 +223,9 @@ function manageClasses (){
 //Function searches for and returns paginated results for string entered into "input" element by user to match user names and/or emails
 function searchStudentElements(){
 
+  // ************************************************************************
+ // manageClasses();
 
-  //Reset studentListHolder to ready it to cache search results (BUG)
-  //$studentList.length is used in another function to determine the number of pages to be displayed
-  // studentListHolder = $studentList;
-  // $studentlist = "";
   console.log("searchStudentElements is being called");
 
   //Variable that stores the number of matching search results is set to zero for new count of search result
@@ -224,7 +242,7 @@ function searchStudentElements(){
  
 
   //Perform search functionality if "input" element value is NOT empty when search button is clicked
-  if($input.val().length !== -1){
+  // if($input.val().length !== 0){
     
     // $(".student-list li").hide();
     
@@ -236,12 +254,13 @@ function searchStudentElements(){
   
       //Loop that iterates over all $userNames and $emails
       //for(var i = 0; i < studentListSize; i++)
+      //for(var i = 0; i < $studentList.children().length; i++)
 
       for(var i = 0; i < $studentList.children().length; i++){
        //****** Does the below line allow the pagination to occur again? Compare with pagination function 
         $(".student-list li").eq(i).hide();
         //Search for matches to entered (sub)string within the "input" element when search button is clicked
-        if($userNames.eq(i).text().indexOf($input.val().toLowerCase()) !== -1 || $emails.eq(i).text().indexOf($input.val().toLowerCase()) !== -1){
+        if($userNames.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1 || $emails.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1){
 
           //Adds matched by indexOf() $studentlist objects to studentListHolder
           // $studentList += studentListHolder.eq(i);
@@ -254,27 +273,25 @@ function searchStudentElements(){
           searchResultCount++;
 
           //Works properly by showing that searchResultCount updates for each search performed, even on keyup
-          console.log(searchResultCount);
+          console.log("Search result count is " + searchResultCount);
         }
 
       }
 
+      // manageClasses();
   
 
       // studentListSize = searchResultCount;
       
       //Call pagination function here?
-      //Pagination is messed up after search because the function has no name
-
-      // manageClasses();
 
 
       //******This needs to be the argument called to populate the page(s) with student-items
       // return $studentList;
       // return searchResultCount;
 
-
-    }
+//below bracket is from if statement above
+    // }
 
 //If "input" element text is empty, then initial student-list is shown (reset) when search button is clicked
   if($input.val().length === 0){
@@ -283,7 +300,7 @@ function searchStudentElements(){
     //CURRENTLY DISPLAYS ALL ELEMENTS WITHIN A SINGLE PAGE - PAGINATION IS FAILING FOR FUNCTION CALL ON INPUT RESET
     //Name the initialization function and write that name below... should be it...
 
-    //initializationFunction();
+    //initializePages(studentListSize)
     // manageClasses();
 
   }
@@ -300,32 +317,33 @@ function searchStudentElements(){
   if(searchResultCount === 0){
     
     //****** Show message - WORKS BUT NEEDS TO BE DETACHED UPON PAGINATION FUNCTION CALL
-    $(".student-list li").hide();  
+    // $(".student-list li").hide();  
     console.log("THIS IS WHERE THE NO SEARCH RESULTS SHOWN MESSAGE GOES");
     displayMessage();
 
   } else{
       //DOES PAGINATION NEED TO BE CALLED HERE IF SEARCH RESULT IS NOT ZERO? LOOKS RIGHT.
       console.log("Call pagination function here");
+      $("student-list").remove("#shownMessage");
 
       studentListSize = searchResultCount;
       initializePages(studentListSize);
 
       // manageClasses();
-      //Needs to be done with CSS SINCE MESSAGE IS NOT A FUNCTION OR COULD DETACH THE DISPLAYMESSAGE() HTML
-      // message.hide();
+     
   }
   return studentListSize;
 }
 
-//Assigns a "no search results found" HTML to message variable
+
+//Appends a "no search results available" message to what should be an empty student list
 function displayMessage(){
 
   /*** HTML FOR THE "NO SEARCH RESULTS AVAILABLE" MESSAGE, needs ID, function to display message ***/
   //DEFAULT AS HIDDEN AND SHOW IF SEARCH RESULTS ARE EMPTY
   //MUST BE REMOVED IF SEARCH RESULTS ARE TO BE EMPTY AGAIN (AVOID DUPLICATE MESSAGAE) OR IF THEY'RE NOT EMPTY ON NEW SEARCH
 
-  message = $(".student-list").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
+  $(".student-list").append("<div id = 'shownMessage'><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
 
 }
 
