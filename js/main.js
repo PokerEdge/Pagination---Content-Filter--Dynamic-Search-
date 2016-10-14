@@ -59,50 +59,6 @@ var $input;
 var searchResultCount;
 
 
-//Message that displays if no search results are shown
-// var message; //= $("ul.student-list").append("<div><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>").css("display", "none");
-
-
-//Variable that points to the button for event binding
-// var $button = $(".page button");
-
-  // $(".student-search button").click(searchStudentElements);
-
-/***
-
-function bindHandlers(){
-
-  // PAGINATION FUNCTION NEEDS TO BE CALLED FOR EACH SEARCH AS WELL
-
-//*******GET EVENT HANDLERS OUTSIDE OF THE PAGINATION FUNCTION FOR APP TO WORK******
-
-  //On click, function manageClasses adds and removes active class on clicked anchor elements
-  $(".pagination a").click(manageClasses);
-
-  //On click, function searchStudentElements searches through student-list elements using text within student-search input element
-  $(".student-search button").click(searchStudentElements);
-
-  //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
-  $(".student-search input").keyup(searchStudentElements);
-
-
-  $(".student-search input").keyup(initializePages);
-
-  $(".student-search input").keyup(manageClasses);
-
-  //RESET STUDENTLISTSIZE TO BE THE TOTAL UNSORTED LIST ELEMENT LIST SIZE FOR ANY FUTURE SEARCHES & ITERATIONS
-  // studentListSize = $studentList.children().length;
-}
-
-***/
-
-//Initialize page with appropriate number of pagenation elements and add the class "active" to the first anchor element
-//*********** NAME THIS FUNCTION SO THAT IT CAN BE CALLED IN THE CASE THAT THE USER DELETES TEXT FROM "INPUT" ELEMENT
-  //Maybe bind function to onload to initialize and then to also be available to be called by name to reset pages
-
-//$(function (totalPageLinks, $listItem, $pageLink) {
-// function initializePages (totalPageLinks, $listItem, $pageLink){}  //ARGUEMENTS HERE SEEM WARRANTED
-
 
 //NAME THIS FUNCTION SO IT CAN BE CALLED LATER
 function initializePages(studentListSize) {
@@ -121,11 +77,6 @@ function initializePages(studentListSize) {
   $(".pagination").detach();
 
   $(".student-list").append('<div class="pagination"><ul></ul></div>');
-  //Initializes all pagination anchor elements
-    //Initialization is done by first resetting the number of list-items attached to the unordered list and then
-    //by adding the appropriate number of $listItems and $pageLinks
-  
-  //Possibly use remove to lighten load of server since data may not need to be stored
 
   $pageUl = $(".pagination ul");
 
