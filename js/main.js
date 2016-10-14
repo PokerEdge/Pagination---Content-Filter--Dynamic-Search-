@@ -186,11 +186,6 @@ function manageClasses (){
   $(".pagination a").removeClass("active");
   $(this).addClass("active");
 
-  //Check if search function has been run before setting the page numbers
-    //if search function has been run, then populate student-list with the results of the search function
-    //bind focus/blur to search button focus/blur - or use click?
-  //if(searchStudentElements()){}
-
   //Set page number for new click
   lastPageNumber = currentPageNumber;
 
@@ -216,7 +211,6 @@ function manageClasses (){
       $(".student-list li").eq(i).show();
     }
   }
-
 }
 
 //**** IMMEDIATELY AFTER EACH SEARCH, PAGINATION SHOULD BE CALLED
@@ -224,7 +218,6 @@ function manageClasses (){
 function searchStudentElements(){
 
   // ************************************************************************
- // manageClasses();
 
   console.log("searchStudentElements is being called");
 
@@ -241,20 +234,10 @@ function searchStudentElements(){
   $emails = $("span.email");
  
 
-  //Perform search functionality if "input" element value is NOT empty when search button is clicked
-  // if($input.val().length !== 0){
-    
-    // $(".student-list li").hide();
-    
     //Display string within "input" element within the console
     console.log($input.val());
     
     //Perform search functionality
-
-  
-      //Loop that iterates over all $userNames and $emails
-      //for(var i = 0; i < studentListSize; i++)
-      //for(var i = 0; i < $studentList.children().length; i++)
 
       for(var i = 0; i < $studentList.children().length; i++){
        //****** Does the below line allow the pagination to occur again? Compare with pagination function 
@@ -262,11 +245,6 @@ function searchStudentElements(){
         //Search for matches to entered (sub)string within the "input" element when search button is clicked
         if($userNames.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1 || $emails.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1){
 
-          //Adds matched by indexOf() $studentlist objects to studentListHolder
-          // $studentList += studentListHolder.eq(i);
-          
-          //Display new student-list in group(s) of 10 with proper pagination
-          // ARE SHOWN RESULTS PAGINATED????? NEED A PAGINATION FUNCTION? (TO BE CALLED AFTER THE FOR LOOP)
           $(".student-list li").eq(i).show();
           
           //***** searchResultCount is new studentListSize to be used in new pagination function call
@@ -278,40 +256,12 @@ function searchStudentElements(){
 
       }
 
-      // manageClasses();
-  
-
-      // studentListSize = searchResultCount;
-      
-      //Call pagination function here?
-
-
-      //******This needs to be the argument called to populate the page(s) with student-items
-      // return $studentList;
-      // return searchResultCount;
-
-//below bracket is from if statement above
-    // }
-
 //If "input" element text is empty, then initial student-list is shown (reset) when search button is clicked
   if($input.val().length === 0){
 
-    // searchResultCount = 0;
-    //CURRENTLY DISPLAYS ALL ELEMENTS WITHIN A SINGLE PAGE - PAGINATION IS FAILING FOR FUNCTION CALL ON INPUT RESET
-    //Name the initialization function and write that name below... should be it...
-
-    //initializePages(studentListSize)
-    // manageClasses();
+    //Manage this fringe case
 
   }
-
-    //Set get text + search function to click handler (done)
-    //Use text within "input" element in order to search student-list for matching strings
-    //return matching strings as new student-list
-
-  // ?????????  
-  //Check if search function has been run before setting the page numbers
-    //if search function has been run, then populate student-list with the results of the search function
 
   //**** Could also run a hide message function if result count is not 0 and call pagination function at the end?
   if(searchResultCount === 0){
@@ -339,33 +289,14 @@ function searchStudentElements(){
 //Appends a "no search results available" message to what should be an empty student list
 function displayMessage(){
 
-  /*** HTML FOR THE "NO SEARCH RESULTS AVAILABLE" MESSAGE, needs ID, function to display message ***/
-  //DEFAULT AS HIDDEN AND SHOW IF SEARCH RESULTS ARE EMPTY
-  //MUST BE REMOVED IF SEARCH RESULTS ARE TO BE EMPTY AGAIN (AVOID DUPLICATE MESSAGAE) OR IF THEY'RE NOT EMPTY ON NEW SEARCH
-
   $(".student-list").append("<div id = 'shownMessage'><h2><b>NO SEARCH RESULTS AVAILABLE</b></h2></div>");
 
 }
 
 initializePages(studentListSize);
   
-  //Binds pagination anchor element so that on user click, function manageClasses adds and removes active class on clicked anchor elements
 
 
-
-  //***** BINDING IS FAILING FOR SOME REASON
-  //Binds search button so that on user click, function searchStudentElements searches through student-list elements for text within student-search input element
-// $(".student-search button").click(searchStudentElements);
-
-  // //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
-  // $(".student-search input").keyup(searchStudentElements);
-
-
-  // $(".student-search input").keyup(initializePages);
-
-  // $(".student-search input").keyup(manageClasses);
-
-// searchStudentElements();
 /********
 
 //Bind search button to return and to show proper student results onclick
