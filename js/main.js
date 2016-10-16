@@ -20,16 +20,29 @@
 
 //Problem - code user interactivity to work with styled elements
 
+
+/***
+
+My advice to you would be to figure out what initializePages does, as well as searchStudentElements, 
+and why commenting out those loops yesterday fixed the first problem. Then walk away and write that down in plain 
+english, and compare it to the list of things you have to do. Because you’re very much lost in the technicalities 
+right now, and I don’t think you’re seeing how the whole system works anymore, or what you need to do.
+
+***/
+
+
+
 //Adds search input and search button to page-header class on ready
 $(function() {
 
   $(".page-header").append("<div class='student-search'><input placeholder='Search for students...'><button>Search</button>");
 
-  $(".student-search button").click(searchStudentElements);
+  $(".student-search button").click(searchShownElements);
 
   //Bind keyup to student-search input element to fire on keyup action from user while that input element has focus
   //Works but pagination isn't working - isn't making first element active properly
-  $(".student-search input").keyup(searchStudentElements);
+  
+  //$(".student-search input").keyup(searchStudentElements);
 
 
   // $(".student-list").append('<div class="pagination"><ul></ul></div>');
@@ -39,8 +52,6 @@ $(function() {
 var $studentList = $(".student-list");
 
 //Variable that stores search results that are to be displayed after search function is run
-//same as var searchResultCounter?
-//Same as lastPageNumber scenario
 var studentListHolder;
 
 //Variable that stores the number of list-items within the unordered-list with the class student-list
@@ -59,12 +70,88 @@ var $input;
 var searchResultCount;
 
 
+//**** IMMEDIATELY AFTER EACH SEARCH, PAGINATION SHOULD BE CALLED
+//Function searches for and returns paginated results for string entered into "input" element by user to match user names and/or emails
+function searchShownElements(){
 
-//NAME THIS FUNCTION SO IT CAN BE CALLED LATER
-function initializePages(studentListSize) {
+  // ************************************************************************
 
-  //TXT DISPLAYS IN DOM
-  console.log("initializePages is being called");
+  console.log("searchShownElements is being called");
+
+  //Variable that stores the number of matching search results is set to zero for new count of search result
+  var searchResultCount = 0;
+
+  //Get "input" element
+  $input = $("input");
+
+  //Get user names
+  $userNames = $(".student-details h3");
+
+  //Get emails
+  $emails = $("span.email");
+ 
+
+    //Display string within "input" element within the console
+    console.log($input.val());
+    
+    //Perform search functionality
+
+      for(var i = 0; i < $studentList.children().length; i++){
+
+        $(".student-list li").eq(i).hide();
+
+        //Search for matches to entered (sub)string within the "input" element when search button is clicked
+        if($userNames.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1 || $emails.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1){
+
+          //If non-case sensitive 'input' text matches .student-list element text, then results are shown
+          $(".student-list li").eq(i).show();
+          
+          //***** searchResultCount is new studentListSize to be used in new pagination function call
+          searchResultCount++;
+          console.log("Search result count is " + searchResultCount);
+        }
+
+      }
+
+//If "input" element text is empty, then initial student-list is shown (reset) when search button is clicked
+  if($input.val().length === 0){
+
+    //Manage this fringe case
+
+  }
+
+  //**** Could also run a hide message function if result count is not 0 and call pagination function at the end?
+  if(searchResultCount === 0){
+    
+    //****** Show message - WORKS BUT NEEDS TO BE DETACHED UPON PAGINATION FUNCTION CALL
+    // $(".student-list li").hide();  
+    console.log("THIS IS WHERE THE NO SEARCH RESULTS SHOWN MESSAGE GOES");
+    displayMessage();
+
+  } else{
+      //DOES PAGINATION NEED TO BE CALLED HERE IF SEARCH RESULT IS NOT ZERO? LOOKS RIGHT.
+      console.log("Call pagination function here");
+      $("student-list").remove("#shownMessage");
+
+      studentListSize = searchResultCount;
+
+      //NOT USING SEEMS TO WORK BUT STILL DISPLAYS ALL STUDENT ELEMENTS WITHOUT PAGINATING THEM
+
+      
+      // initializePages(studentListSize);
+     
+     
+  }
+  // paginateList();
+  // manageClasses();
+  return studentListSize;
+}
+
+
+// *********** DESCRIBE FUNCTION'S PURPOSE HERE IN DETAIL
+function paginateList(studentListSize) {
+
+  console.log("paginateList is being called");
 
   var totalPageLinks;
   var $listItem;
@@ -72,11 +159,12 @@ function initializePages(studentListSize) {
   var $pageUl;
 
   //Calculate the number of pagination elements needed to contain the total number 10 student-list item groups
+
   totalPageLinks = Math.ceil(studentListSize/10);
   
   $(".pagination").detach();
 
-  $(".student-list").append('<div class="pagination"><ul></ul></div>');
+  $(".page").append('<div class="pagination"><ul></ul></div>');
 
   $pageUl = $(".pagination ul");
 
@@ -90,38 +178,41 @@ function initializePages(studentListSize) {
     }
 
     //If no students in list then display a message to let the user know to try another search and that list is empty
+    //****** redundant CODE
     if(studentListSize === 0){
       
       console.log("THIS IS WHERE THE NO SEARCH RESULTS SHOWN MESSAGE GOES");
-      // displayMessage();
+      displayMessage();
     
     } else {
 
       //addClass "active" to the first pagination anchor element
       $(".pagination a").eq(0).addClass("active");
 
-// *********** ISSUE IS HERE!!!!!!! WHY DOES COMMENETING THIS OUT WORK???????
-/***
+// *********** ISSUE IS HERE!!!!!!! WHY DOES COMMENETING THIS OUT WORK??????? Maybe this should be part of pagination function?
 
-      //Hide all student-list list item elements per page  
-      for (var j = 0; j < studentListSize; j++){
-        $(".student-list li").eq(j).hide();
-      }
 
-      //Show 10 relevant student-list list item elements per page
-      for (var i = 0; i < 10; i++){
-        $(".student-list li").eq(i).show();
-      }
+      // //Hide all student-list list item elements per page  
+      // for (var j = 0; j < studentListSize; j++){
+      //   $(".student-list li").eq(j).hide();
+      // }
+
+      // //Show 10 relevant student-list list item elements per page
+      // for (var i = 0; i < 10; i++){
+      //   $(".student-list li").eq(i).show();
+      // }
     
-***/
+
     }
     
+    //Not firing
     $(".pagination a").click(manageClasses);
 
-    //
+    // $(".student-search input").keyup(searchShownElements);
+
     // manageClasses();
 
-    studentListSize = $studentList.children().length;
+    //studentListSize = $studentList.children().length;
 
 }
 
@@ -134,6 +225,10 @@ function manageClasses (){
   console.log("manageClasses is being called");
    
   //Maybe add first page here?
+  //initializePages(studentListSize);
+
+
+
   $(".pagination a").removeClass("active");
   $(this).addClass("active");
 
@@ -164,78 +259,6 @@ function manageClasses (){
   }
 }
 
-//**** IMMEDIATELY AFTER EACH SEARCH, PAGINATION SHOULD BE CALLED
-//Function searches for and returns paginated results for string entered into "input" element by user to match user names and/or emails
-function searchStudentElements(){
-
-  // ************************************************************************
-
-  console.log("searchStudentElements is being called");
-
-  //Variable that stores the number of matching search results is set to zero for new count of search result
-  var searchResultCount = 0;
-
-  //Get "input" element
-  $input = $("input");
-
-  //Get user names
-  $userNames = $(".student-details h3");
-
-  //Get emails
-  $emails = $("span.email");
- 
-
-    //Display string within "input" element within the console
-    console.log($input.val());
-    
-    //Perform search functionality
-
-      for(var i = 0; i < $studentList.children().length; i++){
-       //****** Does the below line allow the pagination to occur again? Compare with pagination function 
-        $(".student-list li").eq(i).hide();
-        //Search for matches to entered (sub)string within the "input" element when search button is clicked
-        if($userNames.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1 || $emails.eq(i).text().toLowerCase().indexOf($input.val().toLowerCase()) !== -1){
-
-          $(".student-list li").eq(i).show();
-          
-          //***** searchResultCount is new studentListSize to be used in new pagination function call
-          searchResultCount++;
-
-          //Works properly by showing that searchResultCount updates for each search performed, even on keyup
-          console.log("Search result count is " + searchResultCount);
-        }
-
-      }
-
-//If "input" element text is empty, then initial student-list is shown (reset) when search button is clicked
-  if($input.val().length === 0){
-
-    //Manage this fringe case
-
-  }
-
-  //**** Could also run a hide message function if result count is not 0 and call pagination function at the end?
-  if(searchResultCount === 0){
-    
-    //****** Show message - WORKS BUT NEEDS TO BE DETACHED UPON PAGINATION FUNCTION CALL
-    // $(".student-list li").hide();  
-    console.log("THIS IS WHERE THE NO SEARCH RESULTS SHOWN MESSAGE GOES");
-    displayMessage();
-
-  } else{
-      //DOES PAGINATION NEED TO BE CALLED HERE IF SEARCH RESULT IS NOT ZERO? LOOKS RIGHT.
-      console.log("Call pagination function here");
-      $("student-list").remove("#shownMessage");
-
-      studentListSize = searchResultCount;
-      initializePages(studentListSize);
-
-      // manageClasses();
-     
-  }
-  return studentListSize;
-}
-
 
 //Appends a "no search results available" message to what should be an empty student list
 function displayMessage(){
@@ -244,7 +267,7 @@ function displayMessage(){
 
 }
 
-initializePages(studentListSize);
+paginateList(studentListSize);
   
 
 
